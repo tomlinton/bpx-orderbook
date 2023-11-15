@@ -165,6 +165,11 @@ async fn main() {
             loop {
                 for event in events.lock().await.drain(..) {
                     let mut order_book = order_book.lock().await;
+
+                    if order_book.last_update_id != event.first_update_id - 1 {
+                        panic!("Dropped messages");
+                    }
+
                     order_book.last_update_id = event.last_update_id;
 
                     for (price, quantity) in event.asks {
